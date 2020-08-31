@@ -20,7 +20,69 @@ export interface Domain {
 }
 
 /**
- * An interface representing AvailabilityData.
+ * Data struct to contain only C section with custom fields.
+ */
+export interface Base {
+  /**
+   * Name of item (B section) if any. If telemetry data is derived straight from this, this should
+   * be null.
+   */
+  baseType?: string;
+  /**
+   * The data payload for the telemetry request
+   */
+  baseData?: Domain;
+}
+
+/**
+ * System variables for a telemetry item.
+ */
+export interface TelemetryEnvelope {
+  /**
+   * Envelope version. For internal use only. By assigning this the default, it will not be
+   * serialized within the payload unless changed to a value other than #1. Default value: 1.
+   */
+  ver?: number;
+  /**
+   * Type name of telemetry data item.
+   */
+  name: string;
+  /**
+   * Event date time when telemetry item was created. This is the wall clock time on the client
+   * when the event was generated. There is no guarantee that the client's time is accurate. This
+   * field must be formatted in UTC ISO 8601 format, with a trailing 'Z' character, as described
+   * publicly on https://en.wikipedia.org/wiki/ISO_8601#UTC. Note: the number of decimal seconds
+   * digits provided are variable (and unspecified). Consumers should handle this, i.e. managed
+   * code consumers should not use format 'O' for parsing as it specifies a fixed length. Example:
+   * 2009-06-15T13:45:30.0000000Z.
+   */
+  time: Date;
+  /**
+   * Sampling rate used in application. This telemetry item represents 1 / sampleRate actual
+   * telemetry items. Default value: 100.
+   */
+  sampleRate?: number;
+  /**
+   * Sequence field used to track absolute order of uploaded events.
+   */
+  seq?: string;
+  /**
+   * The instrumentation key of the Application Insights resource.
+   */
+  iKey?: string;
+  /**
+   * Key/value collection of context properties. See ContextTagKeys for information on available
+   * properties.
+   */
+  tags?: { [propertyName: string]: string };
+  /**
+   * Telemetry data item.
+   */
+  data?: Base;
+}
+
+/**
+ * Instances of AvailabilityData represent the result of executing an availability test.
  */
 export interface AvailabilityData extends Domain {
   /**
@@ -63,21 +125,6 @@ export interface AvailabilityData extends Domain {
 }
 
 /**
- * Data struct to contain only C section with custom fields.
- */
-export interface Base {
-  /**
-   * Name of item (B section) if any. If telemetry data is derived straight from this, this should
-   * be null.
-   */
-  baseType?: string;
-  /**
-   * The data payload for the telemetry request
-   */
-  baseData?: Domain;
-}
-
-/**
  * Metric data single measurement.
  */
 export interface DataPoint {
@@ -117,7 +164,8 @@ export interface DataPoint {
 }
 
 /**
- * An interface representing EventData.
+ * Instances of Event represent structured event records that can be grouped and searched by their
+ * properties. Event data item also creates a metric of event count by name.
  */
 export interface EventData extends Domain {
   /**
@@ -199,7 +247,8 @@ export interface ExceptionDetails {
 }
 
 /**
- * An interface representing ExceptionData.
+ * An instance of Exception represents a handled or unhandled exception that occurred during
+ * execution of the monitored application.
  */
 export interface ExceptionData extends Domain {
   /**
@@ -232,7 +281,9 @@ export interface ExceptionData extends Domain {
 }
 
 /**
- * An interface representing MessageData.
+ * Instances of Message represent printf-like trace statements that are text-searched. Log4Net,
+ * NLog and other text-based log file entries are translated into intances of this type. The
+ * message does not have measurements.
  */
 export interface MessageData extends Domain {
   /**
@@ -259,7 +310,8 @@ export interface MessageData extends Domain {
 }
 
 /**
- * An interface representing MetricsData.
+ * An instance of the Metric item is a list of measurements (single data points) and/or
+ * aggregations.
  */
 export interface MetricsData extends Domain {
   /**
@@ -278,7 +330,8 @@ export interface MetricsData extends Domain {
 }
 
 /**
- * An interface representing PageViewData.
+ * An instance of PageView represents a generic action on a page like a button click. It is also
+ * the base type for PageView.
  */
 export interface PageViewData extends Domain {
   /**
@@ -319,7 +372,8 @@ export interface PageViewData extends Domain {
 }
 
 /**
- * An interface representing PageViewPerfData.
+ * An instance of PageViewPerf represents: a page view with no performance data, a page view with
+ * performance data, or just the performance data of an earlier page request.
  */
 export interface PageViewPerfData extends Domain {
   /**
@@ -376,7 +430,8 @@ export interface PageViewPerfData extends Domain {
 }
 
 /**
- * An interface representing RemoteDependencyData.
+ * An instance of Remote Dependency represents an interaction of the monitored component with a
+ * remote component/service like SQL or an HTTP endpoint.
  */
 export interface RemoteDependencyData extends Domain {
   /**
@@ -431,7 +486,8 @@ export interface RemoteDependencyData extends Domain {
 }
 
 /**
- * An interface representing RequestData.
+ * An instance of PageView represents a generic action on a page like a button click. It is also
+ * the base type for PageView.
  */
 export interface RequestData extends Domain {
   /**
@@ -514,53 +570,6 @@ export interface TrackResponse {
    * An array of error detail objects.
    */
   errors?: ErrorDetails[];
-}
-
-/**
- * System variables for a telemetry item.
- */
-export interface TelemetryEnvelope {
-  /**
-   * Envelope version. For internal use only. By assigning this the default, it will not be
-   * serialized within the payload unless changed to a value other than #1. Default value: 1.
-   */
-  ver?: number;
-  /**
-   * Type name of telemetry data item.
-   */
-  name: string;
-  /**
-   * Event date time when telemetry item was created. This is the wall clock time on the client
-   * when the event was generated. There is no guarantee that the client's time is accurate. This
-   * field must be formatted in UTC ISO 8601 format, with a trailing 'Z' character, as described
-   * publicly on https://en.wikipedia.org/wiki/ISO_8601#UTC. Note: the number of decimal seconds
-   * digits provided are variable (and unspecified). Consumers should handle this, i.e. managed
-   * code consumers should not use format 'O' for parsing as it specifies a fixed length. Example:
-   * 2009-06-15T13:45:30.0000000Z.
-   */
-  time: Date;
-  /**
-   * Sampling rate used in application. This telemetry item represents 1 / sampleRate actual
-   * telemetry items. Default value: 100.
-   */
-  sampleRate?: number;
-  /**
-   * Sequence field used to track absolute order of uploaded events.
-   */
-  seq?: string;
-  /**
-   * The instrumentation key of the Application Insights resource.
-   */
-  iKey?: string;
-  /**
-   * Key/value collection of context properties. See ContextTagKeys for information on available
-   * properties.
-   */
-  tags?: { [propertyName: string]: string };
-  /**
-   * Telemetry data item.
-   */
-  data?: Base;
 }
 
 /**

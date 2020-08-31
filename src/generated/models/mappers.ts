@@ -25,6 +25,97 @@ export const Domain: msRest.CompositeMapper = {
   }
 };
 
+export const Base: msRest.CompositeMapper = {
+  serializedName: "Base",
+  type: {
+    name: "Composite",
+    className: "Base",
+    modelProperties: {
+      baseType: {
+        serializedName: "baseType",
+        type: {
+          name: "String"
+        }
+      },
+      baseData: {
+        serializedName: "baseData",
+        type: {
+          name: "Composite",
+          className: "Domain"
+        }
+      }
+    }
+  }
+};
+
+export const TelemetryEnvelope: msRest.CompositeMapper = {
+  serializedName: "TelemetryEnvelope",
+  type: {
+    name: "Composite",
+    className: "TelemetryEnvelope",
+    modelProperties: {
+      ver: {
+        serializedName: "ver",
+        defaultValue: 1,
+        type: {
+          name: "Number"
+        }
+      },
+      name: {
+        required: true,
+        serializedName: "name",
+        type: {
+          name: "String"
+        }
+      },
+      time: {
+        required: true,
+        serializedName: "time",
+        type: {
+          name: "DateTime"
+        }
+      },
+      sampleRate: {
+        serializedName: "sampleRate",
+        defaultValue: 100,
+        type: {
+          name: "Number"
+        }
+      },
+      seq: {
+        serializedName: "seq",
+        type: {
+          name: "String"
+        }
+      },
+      iKey: {
+        serializedName: "iKey",
+        type: {
+          name: "String"
+        }
+      },
+      tags: {
+        serializedName: "tags",
+        type: {
+          name: "Dictionary",
+          value: {
+            type: {
+              name: "String"
+            }
+          }
+        }
+      },
+      data: {
+        serializedName: "data",
+        type: {
+          name: "Composite",
+          className: "Base"
+        }
+      }
+    }
+  }
+};
+
 export const AvailabilityData: msRest.CompositeMapper = {
   serializedName: "AvailabilityData",
   type: {
@@ -43,9 +134,6 @@ export const AvailabilityData: msRest.CompositeMapper = {
       id: {
         required: true,
         serializedName: "id",
-        constraints: {
-          MaxLength: 512
-        },
         type: {
           name: "String"
         }
@@ -53,9 +141,6 @@ export const AvailabilityData: msRest.CompositeMapper = {
       name: {
         required: true,
         serializedName: "name",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
@@ -77,18 +162,12 @@ export const AvailabilityData: msRest.CompositeMapper = {
       },
       runLocation: {
         serializedName: "runLocation",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       message: {
         serializedName: "message",
-        constraints: {
-          MaxLength: 8192
-        },
         type: {
           name: "String"
         }
@@ -119,29 +198,6 @@ export const AvailabilityData: msRest.CompositeMapper = {
   }
 };
 
-export const Base: msRest.CompositeMapper = {
-  serializedName: "Base",
-  type: {
-    name: "Composite",
-    className: "Base",
-    modelProperties: {
-      baseType: {
-        serializedName: "baseType",
-        type: {
-          name: "String"
-        }
-      },
-      baseData: {
-        serializedName: "baseData",
-        type: {
-          name: "Composite",
-          className: "Domain"
-        }
-      }
-    }
-  }
-};
-
 export const DataPoint: msRest.CompositeMapper = {
   serializedName: "DataPoint",
   type: {
@@ -150,9 +206,6 @@ export const DataPoint: msRest.CompositeMapper = {
     modelProperties: {
       ns: {
         serializedName: "ns",
-        constraints: {
-          MaxLength: 256
-        },
         type: {
           name: "String"
         }
@@ -160,9 +213,6 @@ export const DataPoint: msRest.CompositeMapper = {
       name: {
         required: true,
         serializedName: "name",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
@@ -230,9 +280,6 @@ export const EventData: msRest.CompositeMapper = {
       name: {
         required: true,
         serializedName: "name",
-        constraints: {
-          MaxLength: 512
-        },
         type: {
           name: "String"
         }
@@ -279,27 +326,18 @@ export const StackFrame: msRest.CompositeMapper = {
       method: {
         required: true,
         serializedName: "method",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       assembly: {
         serializedName: "assembly",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       fileName: {
         serializedName: "fileName",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
@@ -334,9 +372,6 @@ export const ExceptionDetails: msRest.CompositeMapper = {
       },
       typeName: {
         serializedName: "typeName",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
@@ -344,9 +379,6 @@ export const ExceptionDetails: msRest.CompositeMapper = {
       message: {
         required: true,
         serializedName: "message",
-        constraints: {
-          MaxLength: 32768
-        },
         type: {
           name: "String"
         }
@@ -360,9 +392,6 @@ export const ExceptionDetails: msRest.CompositeMapper = {
       },
       stack: {
         serializedName: "stack",
-        constraints: {
-          MaxLength: 32768
-        },
         type: {
           name: "String"
         }
@@ -418,9 +447,6 @@ export const ExceptionData: msRest.CompositeMapper = {
       },
       problemId: {
         serializedName: "problemId",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
@@ -469,9 +495,6 @@ export const MessageData: msRest.CompositeMapper = {
       message: {
         required: true,
         serializedName: "message",
-        constraints: {
-          MaxLength: 32768
-        },
         type: {
           name: "String"
         }
@@ -569,9 +592,6 @@ export const PageViewData: msRest.CompositeMapper = {
       id: {
         required: true,
         serializedName: "id",
-        constraints: {
-          MaxLength: 512
-        },
         type: {
           name: "String"
         }
@@ -579,18 +599,12 @@ export const PageViewData: msRest.CompositeMapper = {
       name: {
         required: true,
         serializedName: "name",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       url: {
         serializedName: "url",
-        constraints: {
-          MaxLength: 2048
-        },
         type: {
           name: "String"
         }
@@ -603,9 +617,6 @@ export const PageViewData: msRest.CompositeMapper = {
       },
       referredUri: {
         serializedName: "referredUri",
-        constraints: {
-          MaxLength: 2048
-        },
         type: {
           name: "String"
         }
@@ -654,9 +665,6 @@ export const PageViewPerfData: msRest.CompositeMapper = {
       id: {
         required: true,
         serializedName: "id",
-        constraints: {
-          MaxLength: 512
-        },
         type: {
           name: "String"
         }
@@ -664,18 +672,12 @@ export const PageViewPerfData: msRest.CompositeMapper = {
       name: {
         required: true,
         serializedName: "name",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       url: {
         serializedName: "url",
-        constraints: {
-          MaxLength: 2048
-        },
         type: {
           name: "String"
         }
@@ -759,9 +761,6 @@ export const RemoteDependencyData: msRest.CompositeMapper = {
       },
       id: {
         serializedName: "id",
-        constraints: {
-          MaxLength: 512
-        },
         type: {
           name: "String"
         }
@@ -769,45 +768,30 @@ export const RemoteDependencyData: msRest.CompositeMapper = {
       name: {
         required: true,
         serializedName: "name",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       resultCode: {
         serializedName: "resultCode",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       data: {
         serializedName: "data",
-        constraints: {
-          MaxLength: 8192
-        },
         type: {
           name: "String"
         }
       },
       type: {
         serializedName: "type",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       target: {
         serializedName: "target",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
@@ -870,18 +854,12 @@ export const RequestData: msRest.CompositeMapper = {
       id: {
         required: true,
         serializedName: "id",
-        constraints: {
-          MaxLength: 512
-        },
         type: {
           name: "String"
         }
       },
       name: {
         serializedName: "name",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
@@ -904,27 +882,18 @@ export const RequestData: msRest.CompositeMapper = {
       responseCode: {
         required: true,
         serializedName: "responseCode",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       source: {
         serializedName: "source",
-        constraints: {
-          MaxLength: 1024
-        },
         type: {
           name: "String"
         }
       },
       url: {
         serializedName: "url",
-        constraints: {
-          MaxLength: 2048
-        },
         type: {
           name: "String"
         }
@@ -1011,77 +980,6 @@ export const TrackResponse: msRest.CompositeMapper = {
               className: "ErrorDetails"
             }
           }
-        }
-      }
-    }
-  }
-};
-
-export const TelemetryEnvelope: msRest.CompositeMapper = {
-  serializedName: "TelemetryEnvelope",
-  type: {
-    name: "Composite",
-    className: "TelemetryEnvelope",
-    modelProperties: {
-      ver: {
-        serializedName: "ver",
-        defaultValue: 1,
-        type: {
-          name: "Number"
-        }
-      },
-      name: {
-        required: true,
-        serializedName: "name",
-        type: {
-          name: "String"
-        }
-      },
-      time: {
-        required: true,
-        serializedName: "time",
-        type: {
-          name: "DateTime"
-        }
-      },
-      sampleRate: {
-        serializedName: "sampleRate",
-        defaultValue: 100,
-        type: {
-          name: "Number"
-        }
-      },
-      seq: {
-        serializedName: "seq",
-        constraints: {
-          MaxLength: 64
-        },
-        type: {
-          name: "String"
-        }
-      },
-      iKey: {
-        serializedName: "iKey",
-        type: {
-          name: "String"
-        }
-      },
-      tags: {
-        serializedName: "tags",
-        type: {
-          name: "Dictionary",
-          value: {
-            type: {
-              name: "String"
-            }
-          }
-        }
-      },
-      data: {
-        serializedName: "data",
-        type: {
-          name: "Composite",
-          className: "Base"
         }
       }
     }

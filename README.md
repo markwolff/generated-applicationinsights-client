@@ -4,5 +4,5 @@
 
 ```zsh
 cd swagger
-autorest --typescript
+autorest --typescript --version="3.0.6187"
 ```

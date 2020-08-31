@@ -9,7 +9,7 @@ const event: EventData = {
 const base: Base = {
   baseData: event,
   baseType: 'EventData',
-}
+};
 const envelope: TelemetryEnvelope = {
   name: 'Microsoft.ApplicationInsights.abc.Event',
   time: new Date(),
