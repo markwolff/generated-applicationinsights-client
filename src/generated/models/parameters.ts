@@ -27,7 +27,7 @@ export const body: OperationParameter = {
     required: true,
     type: {
       name: "Sequence",
-      element: { type: { name: "Composite", className: "TelemetryEnvelope" } }
+      element: { type: { name: "Composite", className: "TelemetryItem" } }
     }
   }
 };
@@ -44,10 +44,10 @@ export const accept: OperationParameter = {
   }
 };
 
-export const endpoint: OperationURLParameter = {
-  parameterPath: "endpoint",
+export const host: OperationURLParameter = {
+  parameterPath: "host",
   mapper: {
-    serializedName: "Endpoint",
+    serializedName: "Host",
     required: true,
     type: {
       name: "String"

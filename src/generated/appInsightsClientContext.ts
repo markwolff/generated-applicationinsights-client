@@ -13,7 +13,7 @@ const packageName = "generated-applicationinsights-client";
 const packageVersion = "1.0.0";
 
 export class AppInsightsClientContext extends coreHttp.ServiceClient {
-  endpoint: string;
+  host: string;
 
   /**
    * Initializes a new instance of the AppInsightsClientContext class.
@@ -34,9 +34,9 @@ export class AppInsightsClientContext extends coreHttp.ServiceClient {
 
     this.requestContentType = "application/json; charset=utf-8";
 
-    this.baseUri = options.endpoint || "{Endpoint}/v2";
+    this.baseUri = options.endpoint || "{Host}/v2";
 
     // Assigning values to Constant parameters
-    this.endpoint = options.endpoint || "https://dc.services.visualstudio.com";
+    this.host = options.host || "https://dc.services.visualstudio.com";
   }
 }

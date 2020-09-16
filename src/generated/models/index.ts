@@ -11,11 +11,11 @@ import * as coreHttp from "@azure/core-http";
 /**
  * System variables for a telemetry item.
  */
-export interface TelemetryEnvelope {
+export interface TelemetryItem {
   /**
    * Envelope version. For internal use only. By assigning this the default, it will not be serialized within the payload unless changed to a value other than #1.
    */
-  ver?: number;
+  version?: number;
   /**
    * Type name of telemetry data item.
    */
@@ -31,11 +31,11 @@ export interface TelemetryEnvelope {
   /**
    * Sequence field used to track absolute order of uploaded events.
    */
-  seq?: string;
+  sequence?: string;
   /**
    * The instrumentation key of the Application Insights resource.
    */
-  iKey?: string;
+  instrumentationKey?: string;
   /**
    * Key/value collection of context properties. See ContextTagKeys for information on available properties.
    */
@@ -43,13 +43,13 @@ export interface TelemetryEnvelope {
   /**
    * Telemetry data item.
    */
-  data?: Base;
+  data?: MonitorBase;
 }
 
 /**
  * Data struct to contain only C section with custom fields.
  */
-export interface Base {
+export interface MonitorBase {
   /**
    * Name of item (B section) if any. If telemetry data is derived straight from this, this should be null.
    */
@@ -57,13 +57,13 @@ export interface Base {
   /**
    * The data payload for the telemetry request
    */
-  baseData?: Domain;
+  baseData?: MonitorDomain;
 }
 
 /**
  * The abstract common base of all domains.
  */
-export interface Domain {
+export interface MonitorDomain {
   /**
    * Ignored value.
    */
@@ -85,13 +85,13 @@ export interface TrackResponse {
   /**
    * An array of error detail objects.
    */
-  errors?: ErrorDetails[];
+  errors?: TelemetryErrorDetails[];
 }
 
 /**
  * The error details
  */
-export interface ErrorDetails {
+export interface TelemetryErrorDetails {
   /**
    * The index in the original payload of the item.
    */
@@ -107,9 +107,47 @@ export interface ErrorDetails {
 }
 
 /**
+ * Metric data single measurement.
+ */
+export interface MetricDataPoint {
+  /**
+   * Namespace of the metric.
+   */
+  namespace?: string;
+  /**
+   * Name of the metric.
+   */
+  name: string;
+  /**
+   * Metric type. Single measurement or the aggregated value.
+   */
+  dataPointType?: DataPointType;
+  /**
+   * Single value for measurement. Sum of individual measurements for the aggregation.
+   */
+  value: number;
+  /**
+   * Metric weight of the aggregated metric. Should not be set for a measurement.
+   */
+  count?: number;
+  /**
+   * Minimum value of the aggregated metric. Should not be set for a measurement.
+   */
+  min?: number;
+  /**
+   * Maximum value of the aggregated metric. Should not be set for a measurement.
+   */
+  max?: number;
+  /**
+   * Standard deviation of the aggregated metric. Should not be set for a measurement.
+   */
+  stdDev?: number;
+}
+
+/**
  * Exception details of the exception in a chain.
  */
-export interface ExceptionDetails {
+export interface TelemetryExceptionDetails {
   /**
    * In case exception is nested (outer exception contains inner one), the id and outerId properties are used to represent the nesting.
    */
@@ -164,81 +202,13 @@ export interface StackFrame {
 }
 
 /**
- * Metric data single measurement.
- */
-export interface DataPoint {
-  /**
-   * Namespace of the metric.
-   */
-  ns?: string;
-  /**
-   * Name of the metric.
-   */
-  name: string;
-  /**
-   * Metric type. Single measurement or the aggregated value. TODO: add default
-   */
-  kind?: DataPointType;
-  /**
-   * Single value for measurement. Sum of individual measurements for the aggregation.
-   */
-  value: number;
-  /**
-   * Metric weight of the aggregated metric. Should not be set for a measurement.
-   */
-  count?: number;
-  /**
-   * Minimum value of the aggregated metric. Should not be set for a measurement.
-   */
-  min?: number;
-  /**
-   * Maximum value of the aggregated metric. Should not be set for a measurement.
-   */
-  max?: number;
-  /**
-   * Standard deviation of the aggregated metric. Should not be set for a measurement.
-   */
-  stdDev?: number;
-}
-
-/**
- * An instance of Exception represents a handled or unhandled exception that occurred during execution of the monitored application.
- */
-export type ExceptionData = Domain & {
-  /**
-   * Schema version
-   */
-  ver: number;
-  /**
-   * Exception chain - list of inner exceptions.
-   */
-  exceptions?: ExceptionDetails[];
-  /**
-   * Severity level. Mostly used to indicate exception severity level when it is reported by logging library.
-   */
-  severityLevel?: SeverityLevel;
-  /**
-   * Identifier of where the exception was thrown in code. Used for exceptions grouping. Typically a combination of exception type and a function from the call stack.
-   */
-  problemId?: string;
-  /**
-   * Collection of custom properties. TODO: max key length validate
-   */
-  properties?: { [propertyName: string]: string };
-  /**
-   * Collection of custom measurements. TODO: max key length validate
-   */
-  measurements?: { [propertyName: string]: number };
-};
-
-/**
  * Instances of AvailabilityData represent the result of executing an availability test.
  */
-export type AvailabilityData = Domain & {
+export type AvailabilityData = MonitorDomain & {
   /**
    * Schema version
    */
-  ver: number;
+  version: number;
   /**
    * Identifier of a test run. Use it to correlate steps of test run and telemetry generated by the service.
    */
@@ -264,11 +234,11 @@ export type AvailabilityData = Domain & {
    */
   message?: string;
   /**
-   * Collection of custom properties. TODO: max key length validate
+   * Collection of custom properties.
    */
   properties?: { [propertyName: string]: string };
   /**
-   * Collection of custom measurements. TODO: max key length validate
+   * Collection of custom measurements.
    */
   measurements?: { [propertyName: string]: number };
 };
@@ -276,21 +246,51 @@ export type AvailabilityData = Domain & {
 /**
  * Instances of Event represent structured event records that can be grouped and searched by their properties. Event data item also creates a metric of event count by name.
  */
-export type EventData = Domain & {
+export type TelemetryEventData = MonitorDomain & {
   /**
    * Schema version
    */
-  ver: number;
+  version: number;
   /**
    * Event name. Keep it low cardinality to allow proper grouping and useful metrics.
    */
   name: string;
   /**
-   * Collection of custom properties. TODO: max key length validate
+   * Collection of custom properties.
    */
   properties?: { [propertyName: string]: string };
   /**
-   * Collection of custom measurements. TODO: max key length validate
+   * Collection of custom measurements.
+   */
+  measurements?: { [propertyName: string]: number };
+};
+
+/**
+ * An instance of Exception represents a handled or unhandled exception that occurred during execution of the monitored application.
+ */
+export type TelemetryExceptionData = MonitorDomain & {
+  /**
+   * Schema version
+   */
+  version: number;
+  /**
+   * Exception chain - list of inner exceptions.
+   */
+  exceptions?: TelemetryExceptionDetails[];
+  /**
+   * Severity level. Mostly used to indicate exception severity level when it is reported by logging library.
+   */
+  severityLevel?: SeverityLevel;
+  /**
+   * Identifier of where the exception was thrown in code. Used for exceptions grouping. Typically a combination of exception type and a function from the call stack.
+   */
+  problemId?: string;
+  /**
+   * Collection of custom properties.
+   */
+  properties?: { [propertyName: string]: string };
+  /**
+   * Collection of custom measurements.
    */
   measurements?: { [propertyName: string]: number };
 };
@@ -298,11 +298,11 @@ export type EventData = Domain & {
 /**
  * Instances of Message represent printf-like trace statements that are text-searched. Log4Net, NLog and other text-based log file entries are translated into intances of this type. The message does not have measurements.
  */
-export type MessageData = Domain & {
+export type MessageData = MonitorDomain & {
   /**
    * Schema version
    */
-  ver: number;
+  version: number;
   /**
    * Trace message
    */
@@ -312,11 +312,11 @@ export type MessageData = Domain & {
    */
   severityLevel?: SeverityLevel;
   /**
-   * Collection of custom properties. TODO: max key length validate
+   * Collection of custom properties.
    */
   properties?: { [propertyName: string]: string };
   /**
-   * Collection of custom measurements. TODO: max key length validate
+   * Collection of custom measurements.
    */
   measurements?: { [propertyName: string]: number };
 };
@@ -324,17 +324,17 @@ export type MessageData = Domain & {
 /**
  * An instance of the Metric item is a list of measurements (single data points) and/or aggregations.
  */
-export type MetricsData = Domain & {
+export type MetricsData = MonitorDomain & {
   /**
    * Schema version
    */
-  ver: number;
+  version: number;
   /**
    * List of metrics. Only one metric in the list is currently supported by Application Insights storage. If multiple data points were sent only the first one will be used.
    */
-  metrics: DataPoint[];
+  metrics: MetricDataPoint[];
   /**
-   * Collection of custom properties. TODO: max key length validate
+   * Collection of custom properties.
    */
   properties?: { [propertyName: string]: string };
 };
@@ -342,11 +342,11 @@ export type MetricsData = Domain & {
 /**
  * An instance of PageView represents a generic action on a page like a button click. It is also the base type for PageView.
  */
-export type PageViewData = Domain & {
+export type PageViewData = MonitorDomain & {
   /**
    * Schema version
    */
-  ver: number;
+  version: number;
   /**
    * Identifier of a page view instance. Used for correlation between page view and other telemetry items.
    */
@@ -368,11 +368,11 @@ export type PageViewData = Domain & {
    */
   referredUri?: string;
   /**
-   * Collection of custom properties. TODO: max key length validate
+   * Collection of custom properties.
    */
   properties?: { [propertyName: string]: string };
   /**
-   * Collection of custom measurements. TODO: max key length validate
+   * Collection of custom measurements.
    */
   measurements?: { [propertyName: string]: number };
 };
@@ -380,11 +380,11 @@ export type PageViewData = Domain & {
 /**
  * An instance of PageViewPerf represents: a page view with no performance data, a page view with performance data, or just the performance data of an earlier page request.
  */
-export type PageViewPerfData = Domain & {
+export type PageViewPerfData = MonitorDomain & {
   /**
    * Schema version
    */
-  ver: number;
+  version: number;
   /**
    * Identifier of a page view instance. Used for correlation between page view and other telemetry items.
    */
@@ -422,11 +422,11 @@ export type PageViewPerfData = Domain & {
    */
   domProcessing?: string;
   /**
-   * Collection of custom properties. TODO: max key length validate
+   * Collection of custom properties.
    */
   properties?: { [propertyName: string]: string };
   /**
-   * Collection of custom measurements. TODO: max key length validate
+   * Collection of custom measurements.
    */
   measurements?: { [propertyName: string]: number };
 };
@@ -434,11 +434,11 @@ export type PageViewPerfData = Domain & {
 /**
  * An instance of Remote Dependency represents an interaction of the monitored component with a remote component/service like SQL or an HTTP endpoint.
  */
-export type RemoteDependencyData = Domain & {
+export type RemoteDependencyData = MonitorDomain & {
   /**
    * Schema version
    */
-  ver: number;
+  version: number;
   /**
    * Identifier of a dependency call instance. Used for correlation with the request telemetry item corresponding to this dependency call.
    */
@@ -472,11 +472,11 @@ export type RemoteDependencyData = Domain & {
    */
   success?: boolean;
   /**
-   * Collection of custom properties. TODO: max key length validate
+   * Collection of custom properties.
    */
   properties?: { [propertyName: string]: string };
   /**
-   * Collection of custom measurements. TODO: max key length validate
+   * Collection of custom measurements.
    */
   measurements?: { [propertyName: string]: number };
 };
@@ -484,11 +484,11 @@ export type RemoteDependencyData = Domain & {
 /**
  * An instance of PageView represents a generic action on a page like a button click. It is also the base type for PageView.
  */
-export type RequestData = Domain & {
+export type RequestData = MonitorDomain & {
   /**
    * Schema version
    */
-  ver: number;
+  version: number;
   /**
    * Identifier of a request call instance. Used for correlation between request and other telemetry items.
    */
@@ -518,14 +518,18 @@ export type RequestData = Domain & {
    */
   url?: string;
   /**
-   * Collection of custom properties. TODO: max key length validate
+   * Collection of custom properties.
    */
   properties?: { [propertyName: string]: string };
   /**
-   * Collection of custom measurements. TODO: max key length validate
+   * Collection of custom measurements.
    */
   measurements?: { [propertyName: string]: number };
 };
+/**
+ * Defines values for DataPointType.
+ */
+export type DataPointType = "Measurement" | "Aggregation" | string;
 /**
  * Defines values for SeverityLevel.
  */
@@ -537,41 +541,37 @@ export type SeverityLevel =
   | "Critical"
   | string;
 /**
- * Defines values for DataPointType.
- */
-export type DataPointType = "Measurement" | "Aggregation" | string;
-/**
  * Defines values for ContextTagKeys.
  */
 export type ContextTagKeys =
-  | "ApplicationVersion"
-  | "DeviceId"
-  | "DeviceLocale"
-  | "DeviceModel"
-  | "DeviceOEMName"
-  | "DeviceOSVersion"
-  | "DeviceType"
-  | "LocationIp"
-  | "LocationCountry"
-  | "LocationProvince"
-  | "LocationCity"
-  | "OperationId"
-  | "OperationName"
-  | "OperationParentId"
-  | "OperationSyntheticSource"
-  | "OperationCorrelationVector"
-  | "SessionId"
-  | "SessionIsFirst"
-  | "UserAccountId"
-  | "UserId"
-  | "UserAuthUserId"
-  | "CloudRole"
-  | "CloudRoleVer"
-  | "CloudRoleInstance"
-  | "CloudLocation"
-  | "InternalSdkVersion"
-  | "InternalAgentVersion"
-  | "InternalNodeName  "
+  | "ai.application.ver"
+  | "ai.device.id"
+  | "ai.device.locale"
+  | "ai.device.model"
+  | "ai.device.oemName"
+  | "ai.device.osVersion"
+  | "ai.device.type"
+  | "ai.location.ip"
+  | "ai.location.country"
+  | "ai.location.province"
+  | "ai.location.city"
+  | "ai.operation.id"
+  | "ai.operation.name"
+  | "ai.operation.parentId"
+  | "ai.operation.syntheticSource"
+  | "ai.operation.correlationVector"
+  | "ai.session.id"
+  | "ai.session.isFirst"
+  | "ai.user.accountId"
+  | "ai.user.id"
+  | "ai.user.authUserId"
+  | "ai.cloud.role"
+  | "ai.cloud.roleVer"
+  | "ai.cloud.roleInstance"
+  | "ai.cloud.location"
+  | "ai.internal.sdkVersion"
+  | "ai.internal.agentVersion"
+  | "ai.internal.nodeName"
   | string;
 
 /**
@@ -602,7 +602,7 @@ export interface AppInsightsClientOptionalParams
   /**
    * Breeze endpoint: https://dc.services.visualstudio.com
    */
-  endpoint?: string;
+  host?: string;
   /**
    * Overrides client endpoint.
    */

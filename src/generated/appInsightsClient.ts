@@ -12,7 +12,7 @@ import * as Mappers from "./models/mappers";
 import { AppInsightsClientContext } from "./appInsightsClientContext";
 import {
   AppInsightsClientOptionalParams,
-  TelemetryEnvelope,
+  TelemetryItem,
   AppInsightsClientTrackResponse
 } from "./models";
 
@@ -34,7 +34,7 @@ export class AppInsightsClient extends AppInsightsClientContext {
    * @param options The options parameters.
    */
   track(
-    body: TelemetryEnvelope[],
+    body: TelemetryItem[],
     options?: coreHttp.OperationOptions
   ): Promise<AppInsightsClientTrackResponse> {
     const operationOptions: coreHttp.RequestOptionsBase = coreHttp.operationOptionsToRequestOptionsBase(
@@ -74,13 +74,10 @@ const trackOperationSpec: coreHttp.OperationSpec = {
     },
     503: {
       bodyMapper: Mappers.TrackResponse
-    },
-    default: {
-      bodyMapper: Mappers.ExceptionData
     }
   },
   requestBody: Parameters.body,
-  urlParameters: [Parameters.endpoint],
+  urlParameters: [Parameters.host],
   headerParameters: [Parameters.contentType, Parameters.accept],
   mediaType: "json",
   serializer
